@@ -2,14 +2,17 @@ import express from 'express';
 import { config } from './config/config';
 import mongoose from 'mongoose';
 
+import { userController } from './controller/user.controller';
+import { taskController } from './controller/task.controller';
+
 /**
  * Servidor backend da aplicação
  */
 class Server {
     constructor(app = express()) {
-        this.middleWare(app);
+        this.middleware(app);
         this.database();
-        this.allRoutes(app);
+        this.routes(app);
         this.startServer(app);
     }
 
@@ -17,7 +20,7 @@ class Server {
      * Para validação de request
      * @param app o aplicativo express que receberá as requests
      */
-    async middleWare(app: any) {
+    async middleware(app:any) {
         app.use(express.json());
     }
 
@@ -42,15 +45,11 @@ class Server {
      * Para descrição dos endpoints
      * @param app o aplicativo express que receberá as requests
      */
-    async allRoutes(app: any) {
+    async routes(app:any) {
         const prefix = "/api";
         /* Endpoints */
-        // app.get(`${prefix}/run`, async (request, response) => {
-        //     await controller.run(request, response);
-        // });
-        /* app.<tipo de rota>(<endereço>, <função anônima> => {
-            <funções a serem chamadas>
-        }) */
+        app.get(`${prefix}/cadastrar`, userController.createUser);
+        /* app.<tipo de rota>(<endereço>, <controller>.<funcao>) */
 
     }
 

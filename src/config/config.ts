@@ -20,12 +20,12 @@ const throwIfNot =
 
 /* Para ter certeza que todas as variáveis de ambiente existem */
 [
-    'PORT',
-    'NODE_ENV',
-    'DB_PASSWORD',
-    'DB_USERNAME',
-    'DB_NAME',
-    'DB_HOST',
+    "PORT",
+    "NODE_ENV",
+    "DB_PASSWORD",
+    "DB_USERNAME",
+    "DB_NAME",
+    "DB_HOST",
 ].forEach(v => {
     throwIfNot(process.env, v);
 });
