@@ -1,7 +1,7 @@
-import { Task } from '../model/task';
+import { Task } from "../model/task";
 
 /**
- * Descreve todas as interações do modelo 'Task'.
+ * Descreve todas as interações do modelo "Task".
  */
 class TaskService {
 
