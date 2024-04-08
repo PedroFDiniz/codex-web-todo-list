@@ -1,7 +1,7 @@
-import { User } from '../model/user';
+import { User } from "../model/user";
 
 /**
- * Descreve todas as interações do modelo 'User'.
+ * Descreve todas as interações do modelo "User".
  */
 class UserService {
 

@@ -1,9 +1,9 @@
-import express from 'express';
-import { config } from './config/config';
-import mongoose from 'mongoose';
+import express from "express";
+import { config } from "./config/config";
+import mongoose from "mongoose";
 
-import { userController } from './controller/user.controller';
-import { taskController } from './controller/task.controller';
+import { userController } from "./controller/user.controller";
+import { taskController } from "./controller/task.controller";
 
 /**
  * Servidor backend da aplicação

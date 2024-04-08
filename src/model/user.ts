@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const usuarioSchema = new Schema({
@@ -9,5 +9,5 @@ const usuarioSchema = new Schema({
     password: String,
     picture: String,
 });
-const User = mongoose.model('User', usuarioSchema);
+const User = mongoose.model("User", usuarioSchema);
 export { User };
