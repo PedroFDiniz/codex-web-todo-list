@@ -1,13 +1,37 @@
 import mongoose from "mongoose";
+import { db } from "../database/db";
 const { Schema } = mongoose;
 
-const usuarioSchema = new Schema({
-    name: String,
-    age: Number,
-    sex: String,
-    email: String,
-    password: String,
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    age: {
+        type: Number,
+        required: true,
+    },
+    sex: {
+        type: String,
+        required: true,
+        enum: ['M', 'F'],
+    },
+    email: {
+        type: String,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    token: String,
     picture: String,
+    tasks: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Task',
+        }
+    ]
 });
-const User = mongoose.model("User", usuarioSchema);
+let User = mongoose.model("User", userSchema);
 export { User };

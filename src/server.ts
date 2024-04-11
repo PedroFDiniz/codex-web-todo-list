@@ -1,9 +1,10 @@
 import express from "express";
 import { config } from "./config/config";
-import mongoose from "mongoose";
 
+import { db } from "./database/db";
 import { userController } from "./controller/user.controller";
 import { taskController } from "./controller/task.controller";
+import { authority } from "./controller/authentication.controller";
 
 /**
  * Servidor backend da aplicação
@@ -17,45 +18,42 @@ class Server {
     }
 
     /**
-     * Para validação de request
-     * @param app o aplicativo express que receberá as requests
+     * Para garantir que as requisições terão corpo JSON.
+     * @param app o aplicativo express que receberá as requisições.
      */
     async middleware(app:any) {
         app.use(express.json());
     }
 
     /**
-     * Para inicializar a base de dados
+     * Para inicializar a base de dados.
      */
     async database() {
-        try {
-            const { username, password, database, host } = config;
-            await mongoose.connect(
-                `mongodb+srv://${username}:${password}@${database}.${host}`);
-            console.log("Conexão bem sucedida");
-        } catch (error) {
-            console.error(
-                "Não foi possível estabelecer conexão com o BD",
-                error
-            );
-        }
+        // db.init();
+        db.connect();
     }
 
     /**
-     * Para descrição dos endpoints
-     * @param app o aplicativo express que receberá as requests
+     * Para descrição dos endpoints.
+     * @param app o aplicativo express que receberá as requisições.
      */
     async routes(app:any) {
-        const prefix = "/api";
         /* Endpoints */
-        app.get(`${prefix}/cadastrar`, userController.createUser);
         /* app.<tipo de rota>(<endereço>, <controller>.<funcao>) */
+        app.post(`/cadastrar`, userController.createUser);
+        app.get(`/login`, authority.login);
 
     }
 
+    /**
+     * Inicializa o servidor Express para receber requisições.
+     * @param app 
+     */
     async startServer(app: any) {
         app.listen(config.port, () => {
-            console.log(`Servidor rodando no endereço http://localhost:${config.port}`);
+            console.log(
+                `Servidor rodando no endereço http://localhost:${config.port}`
+            );
         });
     }
 }

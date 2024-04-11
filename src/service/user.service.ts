@@ -1,3 +1,4 @@
+import { db } from "../database/db";
 import { User } from "../model/user";
 
 /**
@@ -5,6 +6,54 @@ import { User } from "../model/user";
  */
 class UserService {
 
+    async create(
+        name:string,
+        age:number,
+        sex:string,
+        email:string,
+        password:string
+    ) {
+        try {
+            const newUser = await User.create({
+                name,
+                age,
+                sex,
+                email,
+                password,
+            });
+            return newUser;
+        } catch (error) { return null; }
+    }
+
+    async find(email:string) {
+        if (email && email !== "")
+            return await User.find({ email }, "_id email password token");
+        return null;
+    }
+
+    async findById(id:string) {
+        if (id && id !== "")
+            return await User.findById( id );
+        return null;
+    }
+
+    async edit(
+        id:string,
+        name:string = "",
+        age:number = 0,
+        picture:string = ""
+    ) {
+        const filter = { id };
+        let update:any = { };
+
+        if (name !== "") update.name = name;
+        if (age !== 0) update.age = age;
+        if (picture !== "") update.picture = picture;
+
+        return await User.findOneAndUpdate(filter, update);
+    }
+
 }
 
-export { UserService };
+const service = new UserService();
+export { service };
