@@ -1,37 +1,41 @@
 import mongoose from "mongoose";
 import { config } from "../config/config";
-// import { userSchema } from "../model/user";
-// import { taskSchema } from "../model/task";
-import { User } from "../model/user";
+import { Log } from "../util/log";
 
 class Database {
-    // db:mongoose.Connection;
+    #connection:mongoose.Connection;
+    hasConnected:Promise<any>;
 
     constructor() {
         this.connect();
-        // this.init();
+        this.#connection = mongoose.connection;
+        this.#connection.on( 'disconnecting', this.#onDisconnecting );
+        this.#connection.on( 'disconnected', this.#onDisconnected );
+        this.#connection.on( 'reconnected', this.#onReconnected );
+        this.#connection.on( 'connected', this.#onConnected );
+        this.#connection.on( 'close', this.#onClose );
+        this.#connection.on( 'open', this.#onOpen );
     }
-
-    // init = async () => {
-    //     await this.model("User", userSchema);
-    //     await this.model("Task", taskSchema);
-    // }
 
     connect = async () => {
         const { username, password, database, host } = config;
-        mongoose.connect(
+        this.hasConnected = mongoose.connect(
             `mongodb+srv://${username}:${password}@${database}.${host}`
-        ).then(() => console.log("database on"));
+        );
     }
 
-    // async getState() { return this.db.readyState; }
-
-    // get() { return this.db; }
-
-    // async model(modelName:string, schema:mongoose.Schema) {
-    //     return this.db.model(modelName, schema);
-    // }
+    #onClose = () =>
+    { Log.write("Database: Closed."); }
+    #onConnected = () =>
+    { Log.write("Database: Establishing connection."); }
+    #onDisconnected = () =>
+    { Log.write("Database: Connection lost."); }
+    #onDisconnecting = () =>
+    { Log.write("Database: Disconnecting."); }
+    #onOpen = () =>
+    { Log.write("Database: Connection open."); }
+    #onReconnected = () =>
+    { Log.write("Database: Connection restored."); }
 }
 
-const db = new Database();
-export { db };
+export { Database };

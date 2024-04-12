@@ -1,7 +1,8 @@
 import express from "express";
 import { config } from "./config/config";
+import mongoose from 'mongoose';
 
-import { db } from "./database/db";
+import { Database } from "./database/db";
 import { userController } from "./controller/user.controller";
 import { taskController } from "./controller/task.controller";
 import { authority } from "./controller/authentication.controller";
@@ -10,6 +11,8 @@ import { authority } from "./controller/authentication.controller";
  * Servidor backend da aplicação
  */
 class Server {
+    #db:Database;
+
     constructor(app = express()) {
         this.middleware(app);
         this.database();
@@ -29,8 +32,8 @@ class Server {
      * Para inicializar a base de dados.
      */
     async database() {
-        // db.init();
-        db.connect();
+        this.#db = new Database();
+        await this.#db.hasConnected;
     }
 
     /**
@@ -40,14 +43,20 @@ class Server {
     async routes(app:any) {
         /* Endpoints */
         /* app.<tipo de rota>(<endereço>, <controller>.<funcao>) */
-        app.post(`/cadastrar`, userController.createUser);
         app.get(`/login`, authority.login);
-
+        app.get(`/debug`, userController.findAll);
+        app.post(`/usuario/cadastrar`, userController.createUser);
+        app.post(`/usuario/pesquisar`, userController.findUser);
+        app.post(`/:id/editar`, userController.editUser);
+        app.get(`/:id/perfil`, userController.getUser);
+        // app.get(`/:id/tarefas/`, userController.getTasks);
+        app.post(`/:id/tarefas/agendar`, taskController.scheduleTask);
+        // app.delete(`/:id/tarefas/apagar`, userController.deleteTasks);
     }
 
     /**
      * Inicializa o servidor Express para receber requisições.
-     * @param app 
+     * @param app o aplicativo express que receberá as requisições.
      */
     async startServer(app: any) {
         app.listen(config.port, () => {

@@ -1,11 +1,13 @@
 import { StatusCode } from "../util/statuscode";
 import { service } from "../service/user.service";
 import { compareSync, hashSync } from "bcrypt";
-import uuid from "uuid";
+import { v4 } from "uuid";
+import { Log } from "../util/log";
 
 class AuthController {
     /**
      * Executa o login do usuário no sistema.
+     * Deve receber um email e uma senha no cabeçalho da requisição.
      */
     login = async (request:any, response:any) => {
         let result:any = { };
@@ -15,11 +17,10 @@ class AuthController {
         /* Recebe informações do cliente */
         const { email, password } = request.headers;
         try {
-            let user:any = await service.find(email);
-            const encryptedPassword = hashSync(user.password, 11);
+            let user:any = await service.fetchLogin(email);
             /* Caso o usuário exista e a senha seja correta */
-            if (user && compareSync(password, encryptedPassword)) {
-                user.token = uuid.v4(); /* Cria novo token de acesso */
+            if (user && (password === user.password)) {
+                user.token = v4(); /* Cria novo token de acesso */
                 user = await user.save(); /* Salva no BD */
 
                 /* Devolverá o id e o token ao cliente */
@@ -29,10 +30,12 @@ class AuthController {
                 messages.push('Usuário autorizado.');
                 statusCode = StatusCode.SUCCESS;
             } else {
+                Log.write("Error: empty user or wrong password.");
                 messages.push('Não autorizado.');
                 statusCode = StatusCode.UNAUTHORIZED;
             }
         } catch (error) {
+            Log.write(String(error));
             messages.push("Erro no login.");
         } finally {
             return response
@@ -42,16 +45,16 @@ class AuthController {
     }
 
     /**
-     * Autoriza o acesso do cliente ao sistema às informações do usuário
-     * se o token for válido. Tanto o id quanto o token estão no cabeçalho
-     * da requisição.
+     * Autoriza o acesso do cliente ao sistema com as informações do usuário se
+     * o token for válido. Tanto o id quanto o token devem vir no cabeçalho da
+     * requisição.
      */
     authorize = async (id:string, token:string) => {
         let result:boolean = false;
         try {
             let user = await service.findById(id);
             if (user && user.token === token) result = true;
-        } catch (error) { }
+        } catch (error:any) { Log.write(error.toString()) }
         finally { return result; }
     }
 }
