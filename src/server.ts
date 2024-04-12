@@ -1,7 +1,8 @@
 import express from "express";
 import { config } from "./config/config";
+import mongoose from 'mongoose';
 
-import { db } from "./database/db";
+import { Database } from "./database/db";
 import { userController } from "./controller/user.controller";
 import { taskController } from "./controller/task.controller";
 import { authority } from "./controller/authentication.controller";
@@ -10,6 +11,8 @@ import { authority } from "./controller/authentication.controller";
  * Servidor backend da aplicação
  */
 class Server {
+    #db:Database;
+
     constructor(app = express()) {
         this.middleware(app);
         this.database();
@@ -29,8 +32,8 @@ class Server {
      * Para inicializar a base de dados.
      */
     async database() {
-        // db.init();
-        db.connect();
+        this.#db = new Database();
+        await this.#db.hasConnected;
     }
 
     /**
@@ -42,12 +45,12 @@ class Server {
         /* app.<tipo de rota>(<endereço>, <controller>.<funcao>) */
         app.post(`/cadastrar`, userController.createUser);
         app.get(`/login`, authority.login);
-
+        app.get(`/debug`, userController.findAll);
     }
 
     /**
      * Inicializa o servidor Express para receber requisições.
-     * @param app 
+     * @param app o aplicativo express que receberá as requisições.
      */
     async startServer(app: any) {
         app.listen(config.port, () => {

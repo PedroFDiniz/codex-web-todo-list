@@ -25,9 +25,8 @@ class UserController {
 
             if (isValid) {
                 /* Usar UserService para criar um usuário no BD */
-                const encryptedPassword = hashSync(password, 11);
                 result = await service.create(
-                    name, sex, age, email, encryptedPassword
+                    name, age, sex, email, password
                 );
                 messages.push(`Usuário ${name} criado.`);
                 statusCode = StatusCode.SUCCESS;
@@ -74,6 +73,10 @@ class UserController {
         let statusCode = StatusCode.INTERNAL_ERROR;
         const { id, token } = request.headers;
 
+    }
+
+    findAll = async (request:any, response:any) => {
+        response.status(200).json(service.findAll());
     }
 }
 

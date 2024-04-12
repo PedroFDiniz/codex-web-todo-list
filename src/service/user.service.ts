@@ -1,4 +1,3 @@
-import { db } from "../database/db";
 import { User } from "../model/user";
 
 /**
@@ -15,19 +14,22 @@ class UserService {
     ) {
         try {
             const newUser = await User.create({
-                name,
-                age,
-                sex,
-                email,
-                password,
+                "name": name,
+                "age": age,
+                "sex": sex,
+                "email": email,
+                "password": password,
             });
             return newUser;
-        } catch (error) { return null; }
+        } catch (error) {
+            console.error(error);
+            console.log("errors");
+        }
     }
 
     async find(email:string) {
         if (email && email !== "")
-            return await User.find({ email }, "_id email password token");
+            return await User.findOne({ email }, "_id email password token");
         return null;
     }
 
@@ -51,6 +53,10 @@ class UserService {
         if (picture !== "") update.picture = picture;
 
         return await User.findOneAndUpdate(filter, update);
+    }
+
+    async findAll() {
+        return await User.find({});
     }
 
 }

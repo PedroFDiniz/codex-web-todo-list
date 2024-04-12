@@ -1,4 +1,4 @@
-import { db } from "../database/db";
+import { Task } from "../model/task";
 
 /**
  * Descreve todas as interações do modelo "Task".

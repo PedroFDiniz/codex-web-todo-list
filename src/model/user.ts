@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { db } from "../database/db";
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
     },
     age: {
         type: Number,
@@ -19,6 +19,7 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
