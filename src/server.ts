@@ -46,12 +46,12 @@ class Server {
         app.get(`/login`, authority.login);
         app.get(`/debug`, userController.findAll);
         app.post(`/usuario/cadastrar`, userController.createUser);
-        app.post(`/usuario/search`, userController.findUser);
+        app.post(`/usuario/pesquisar`, userController.findUser);
         app.post(`/:id/editar`, userController.editUser);
         app.get(`/:id/perfil`, userController.getUser);
-        app.get(`/:id/tarefas/`, userController.getTasks);
+        // app.get(`/:id/tarefas/`, userController.getTasks);
         app.post(`/:id/tarefas/agendar`, taskController.scheduleTask);
-        app.delete(`/:id/tarefas/apagar`, userController.deleteTasks);
+        // app.delete(`/:id/tarefas/apagar`, userController.deleteTasks);
     }
 
     /**

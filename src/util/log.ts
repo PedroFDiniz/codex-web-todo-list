@@ -15,7 +15,7 @@ class Log {
         if (process.env.DEBUG === "console") {
             console.log(result);
         }
-        else if (process.env.DEBUG === "true") {
+        else if (process.env.DEBUG === "file") {
             fs.appendFile(
                 `../../${Log.#getToday()}.log`,
                 result,
