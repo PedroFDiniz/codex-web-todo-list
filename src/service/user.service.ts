@@ -1,3 +1,4 @@
+import mongoose, { ObjectId } from "mongoose";
 import { User } from "../model/user";
 import { Log } from "../util/log";
 import { service as tasks } from "./task.service";
@@ -29,21 +30,40 @@ class UserService {
     }
 
     async get(id:string) {
-        if (id && id !== "") {
-            const user =
-                await User.findById(id, "name age sex email picture tasks");
-            if (!user) return null;
-            const taskList = await tasks.fetchMany(user.tasks);
-            return {
-                name: user.name,
-                age: user.age,
-                sex: user.sex,
-                email: user.email,
-                picture: user.picture,
-                tasks: taskList,
-            }
+        if (!id || id === "") return null;
+        const user =
+            await User.findById(id, "name age sex email picture tasks");
+        if (!user) return null;
+        const taskList:any = await tasks.fetchMany(user.tasks);
+        return {
+            name: user.name,
+            age: user.age,
+            sex: user.sex,
+            email: user.email,
+            picture: user.picture,
+            tasks: taskList,
         }
-        return null;
+    }
+
+    async getTasks(id:string) {
+        const user = await User.findById(id, "_id tasks");
+        if (!user) return null;
+        const taskList:any = await tasks.fetchMany(user.tasks);
+
+        return taskList;
+    }
+
+    async deteleTasks(userId:string, ids:string[]) {
+        for (let id in ids) {
+            const updatedUser = await User.updateOne({
+                id: userId
+            }, {
+                $pullAll: {
+                    tasks: [{_id: ids[id]}]
+                }
+            });
+        }
+        tasks.delete(ids);
     }
 
     async fetchLogin(email:string) {

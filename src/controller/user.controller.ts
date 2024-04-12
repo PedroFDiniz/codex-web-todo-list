@@ -2,9 +2,7 @@ import { userValidator } from "../validator/user.validator";
 import { service } from "../service/user.service";
 import { StatusCode } from "../util/statuscode";
 import { authority } from "./authentication.controller";
-import { hashSync } from "bcrypt";
 import { Log } from "../util/log";
-import { User } from "../model/user";
 
 /**
  * Faz a ligação das rotas com as funções do serviço
@@ -94,7 +92,7 @@ class UserController {
                 /* Caso a autorização do usuário tenha sido negada */
                 result.authorized = authorized;
                 status = StatusCode.UNAUTHORIZED;
-                Log.write(`Acess denied to id:${id} and token:${token}.`);
+                Log.write(`Acesso negado ao id:${id} e token:${token}.`);
             }
         } catch (error:any) {
             /* Caso haja algum erro desconhecido */
@@ -145,13 +143,13 @@ class UserController {
                 /* Caso a autorização do usuário tenha sido negada */
                 result.authorized = authorized;
                 status = StatusCode.UNAUTHORIZED;
-                Log.write(`Acess denied to id:${id} and token:${token}.`);
+                Log.write(`Acesso negado ao id:${id} e token:${token}.`);
             }
         } catch (error:any) {
             /* Caso haja algum erro desconhecido */
             result.error = error.name;
             messages.push(error.message);
-            Log.write(`Error: ${error.name}`);
+            Log.write(`Erro: ${error.name}`);
         } finally {
             /* Devolve o resultado da requisição */
             return response
@@ -170,22 +168,30 @@ class UserController {
         try {
             const authorized = await authority.authorize(id, token);
             if (authorized) {
-                const user = await service.findById(id);
+                const user = await service.get(id);
                 if (!user) {
                     const msg = `Usuário não encontrado!`;
                     messages.push(msg);
                     Log.write(msg);
+                    status = StatusCode.INVALID_FIELDS;
                 } else {
                     result = user;
                     const msg = `Usuário ${user.name} resgatado com sucesso.`;
                     messages.push(msg);
                     Log.write(msg);
+                    status = StatusCode.SUCCESS;
                 }
+            } else {
+                /* Caso a autorização do usuário tenha sido negada */
+                result.authorized = authorized;
+                status = StatusCode.UNAUTHORIZED;
+                Log.write(`Acesso negado ao id:${id} e token:${token}.`);
             }
         } catch (error:any) {
             /* Caso haja algum erro desconhecido */
             result.error = error.name;
             messages.push(error.message);
+            Log.write(`Erro: ${error.name}`);
         } finally {
             /* Devolve o resultado da requisição */
             return response
@@ -204,7 +210,38 @@ class UserController {
 
         const { id } = request.params;
         const { token } = request.headers;
-
+        try {
+            const authorized = await authority.authorize(id, token);
+            if (authorized) {
+                result = await service.getTasks(id);
+                if (!result) {
+                    const msg = `Falha ao resgatar tarefas.`
+                    messages.push(msg);
+                    Log.write(msg);
+                    status = StatusCode.INVALID_FIELDS;
+                } else {
+                    const msg = `Tarefas resgatadas.`;
+                    messages.push(msg);
+                    Log.write(msg);
+                    status = StatusCode.SUCCESS;
+                }
+            } else {
+                /* Caso a autorização do usuário tenha sido negada */
+                result.authorized = authorized;
+                status = StatusCode.UNAUTHORIZED;
+                Log.write(`Acesso negado ao id:${id} e token:${token}.`);
+            }
+        } catch (error:any) {
+            /* Caso haja algum erro desconhecido */
+            result.error = error.name;
+            messages.push(error.message);
+            Log.write(`Erro: ${error.name}`);
+        } finally {
+            /* Devolve o resultado da requisição */
+            return response
+                .status(status)
+                .json({ result, messages });
+        }
     }
 
     findAll = async (request:any, response:any) => {

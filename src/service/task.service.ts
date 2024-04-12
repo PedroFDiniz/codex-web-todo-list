@@ -17,11 +17,10 @@ class TaskService {
         } catch (error:any) { return null; }
     }
 
-    async complete(id:string) {
+    async setComplete(id:string) {
         try {
             const task = await Task.findById(id);
-            if (!task) return null;
-            if (task.status === "CONCLUIDA") return null;
+            if (!task || task.status === "CONCLUIDA") return null;
             task.status = "CONCLUIDA";
             return await task.save();
         } catch (error:any) { return null; }
@@ -32,11 +31,11 @@ class TaskService {
         catch (error:any) { return null; }
     }
 
-    async fetchMany(ids:any) {
+    async fetchMany(ids:mongoose.Types.ObjectId[]) {
         try {
             const tasks = await Task.find({
                 '_id': { $in: ids }
-            });
+            },'name date status description');
             return tasks;
         } catch (error:any) { return null; }
     }
@@ -45,7 +44,6 @@ class TaskService {
         try { return await Task.deleteMany({ '_id': { $in: ids }}); }
         catch (error:any) { return null; }
     }
-
 }
 const service = new TaskService();
 export { service };

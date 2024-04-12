@@ -49,9 +49,10 @@ class Server {
         app.post(`/usuario/pesquisar`, userController.findUser);
         app.post(`/:id/editar`, userController.editUser);
         app.get(`/:id/perfil`, userController.getUser);
-        // app.get(`/:id/tarefas/`, userController.getTasks);
+        app.get(`/:id/tarefas/`, userController.getTasks);
         app.post(`/:id/tarefas/agendar`, taskController.scheduleTask);
-        // app.delete(`/:id/tarefas/apagar`, userController.deleteTasks);
+        app.delete(`/:id/tarefas/apagar`, taskController.removeTasks);
+        app.post(`/:id/tarefas/marcar`, taskController.setAsCompleted);
     }
 
     /**
