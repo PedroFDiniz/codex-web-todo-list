@@ -67,7 +67,7 @@ class UserService {
     }
 
     async fetchLogin(email:string) {
-        return await User.find({ email }, "_id email password token");
+        return await User.findOne({ email }, "_id email password token");
     }
 
     async findById(id:string) {
@@ -99,7 +99,7 @@ class UserService {
     }
 
     async findAll() {
-        let result = await User.find({ name: "Pedro"});
+        let result = await User.find({ });
         return result;
     }
 

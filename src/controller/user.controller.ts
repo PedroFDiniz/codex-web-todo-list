@@ -65,29 +65,17 @@ class UserController {
         try {
             const authorized = await authority.authorize(id, token);
             if (authorized) {
-                /* Validação do input */
-                const { isValid, invalidFields, errors } =
-                    userValidator.editUser({ userId, name, email });
-
-                if (isValid) {
-                    result = await service.findUser(
-                        userId, name, email
-                    );
-                    if (!result) {
-                        messages.push(`Usuário não encontrado.`);
-                        Log.write(`Usuário não encontrado.`);
-                    } else {
-                        messages.push(`Usuário ${result.name} encontrado.`);
-                        Log.write(`Encontrado usuário ${result.name}`);
-                    }
-                    status = StatusCode.SUCCESS;
+                result = await service.findUser(
+                    userId, name, email
+                );
+                if (!result) {
+                    messages.push(`Usuário não encontrado.`);
+                    Log.write(`Usuário não encontrado.`);
                 } else {
-                    /* Caso algum dos campos não esteja no formato correto */
-                    result = invalidFields;
-                    errors.map((error:string) => messages.push(error));
-                    status = StatusCode.INVALID_FIELDS;
-                    Log.write(`Campos inválidos: ${invalidFields}`);
+                    messages.push(`Usuário ${result.name} encontrado.`);
+                    Log.write(`Encontrado usuário ${result.name}`);
                 }
+                status = StatusCode.SUCCESS;
             } else {
                 /* Caso a autorização do usuário tenha sido negada */
                 result.authorized = authorized;
@@ -115,7 +103,8 @@ class UserController {
         let result:any = { };
         let messages:string[] = [];
 
-        const { id, token } = request.headers;
+        const { token } = request.headers;
+        const { id } = request.params;
         const { name, age, picture } = request.body;
         /* Corpo relevante da requisição */
         try {
